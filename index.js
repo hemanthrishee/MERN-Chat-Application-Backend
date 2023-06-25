@@ -129,6 +129,7 @@ io.on("connection", (socket) => {
             if (data.t === "announce" && data.message === `${data.username} left the chat`)
             {
                 await Room.updateOne({room: data.room}, {$pull: {users: data.username}});
+                await Room.updateOne({room: data.room}, {$pull: {users: ""}});
                 const room = await Room.findOne({room: data.room});
                 if (room)
                 {
