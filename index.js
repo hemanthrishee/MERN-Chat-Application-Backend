@@ -31,6 +31,20 @@ const roomSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 const Room = mongoose.model("Room", roomSchema);
 
+app.get("/members/:room", (req, res)=> {
+    async function fetchData () {
+        const roomGet = req.params.room;
+        const room = await Room.findOne({room: roomGet});
+        if (room) {
+            res.json({members: room.users})
+        }
+        else {
+            res.json({})
+        }
+    }
+    fetchData();
+})
+
 app.get("/get/:user", (req, res)=> {
     async function execute() {
         const roomGet = req.params.user;
@@ -122,14 +136,11 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-    console.log(socket.id);
-
     socket.on("send_message", (data) => {
         async function execute() {
             if (data.t === "announce" && data.message === `${data.username} left the chat`)
             {
                 await Room.updateOne({room: data.room}, {$pull: {users: data.username}});
-                await Room.updateOne({room: data.room}, {$pull: {users: ""}});
                 const room = await Room.findOne({room: data.room});
                 if (room)
                 {
@@ -165,10 +176,6 @@ io.on("connection", (socket) => {
             }
         }
         execute();
-    });
-
-    socket.on("disconnect", ()=> {
-        console.log("User Disconnected", socket.id);
     });
 });
 
