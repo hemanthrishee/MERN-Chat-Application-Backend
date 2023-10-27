@@ -9,7 +9,7 @@ const CryptoJS = require("crypto-js");
 
 const app = express();
 app.use(cors({
-    origin: ["http://localhost:3000", "https://chat-app-mern-nbvr.onrender.com"]
+    origin: "*"
 }));
 app.use(express.json());
 const saltRounds = process.env.SALT_ROUNDS;
